@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Gedit Clone -Functional</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#242424"><link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css'><link rel="stylesheet" href="./style.css">
+
+  </head>
+    
+  <body>
+  <input type="file" id="fileInput" style="display: none;" onchange="handleFileOpen(event)">
+
+<header id="headerbar">
+    <div class="header-left">
+        <button class="btn" onclick="triggerFileOpen()">Open</button>
+        <button class="btn icon-btn" title="New Tab" onclick="newTab()">+</button>
+        <button class="btn" id="btn-save" onclick="saveCurrentFile()">Save</button>
+    </div>
+    
+    <div class="header-center" id="header-title-container">
+        <div id="header-title">Document 1</div>
+        <div id="header-subtitle">~/Unsaved/Document 1</div>
+    </div>
+    
+    <div class="header-right">
+        <button class="btn icon-btn" title="Find and Replace" onclick="showFindModal(false)">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </button>
+        <div class="hamburger-container">
+            <button class="btn icon-btn" id="btn-hamburger">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+            <div class="hamburger-menu" id="hamburger-dropdown">
+                <div class="menu-item" onclick="newTab()">New Document<span class="hotkey">Ctrl+N</span></div>
+                <div class="menu-item" onclick="saveAsFile()">Save As...<span class="hotkey">Ctrl+Shift+S</span></div>
+                <div class="menu-item" onclick="saveAllFiles()">Save All</div>
+                <div class="divider"></div>
+                <div class="menu-item" onclick="document.execCommand('undo')">Undo<span class="hotkey">Ctrl+Z</span></div>
+                <div class="menu-item" onclick="document.execCommand('redo')">Redo<span class="hotkey">Ctrl+Y</span></div>
+                <div class="divider"></div>
+                <div class="menu-item" onclick="showFindModal(false)">Find...<span class="hotkey">Ctrl+F</span></div>
+                <div class="menu-item" onclick="showFindModal(true)">Find and Replace...<span class="hotkey">Ctrl+H</span></div>
+                <div class="menu-item" onclick="goToLine()">Go to Line...<span class="hotkey">Ctrl+G</span></div>
+                <div class="divider"></div>
+                <div class="menu-item" onclick="toggleSidePanel()">
+                    <span class="check-icon" id="view-check-sidepanel"></span>Side Panel<span class="hotkey">F9</span>
+                </div>
+                <div class="menu-item" onclick="toggleDarkMode()">
+                    <span class="check-icon" id="view-check-darkmode">✓ </span>Dark Mode
+                </div>
+                <div class="menu-item" onclick="toggleWordWrap()">
+                    <span class="check-icon" id="view-check-wordwrap"></span>Word Wrap
+                </div>
+                <div class="menu-item" onclick="toggleLineNumbers()">
+                    <span class="check-icon" id="view-check-linenums">✓ </span>Line Numbers
+                </div>
+                <div class="menu-item" onclick="toggleSpellCheck()">
+                    <span class="check-icon" id="view-check-spell"></span>Spell Check
+                </div>
+                <div class="menu-item" onclick="toggleFullScreen()">Fullscreen<span class="hotkey">F11</span></div>
+                <div class="menu-item has-submenu">
+                    <span>Highlight Mode</span>
+                    <div class="submenu" id="lang-menu">
+                        <div class="menu-item" onclick="setLanguage('none')">Plain Text</div>
+                        <div class="menu-item" onclick="setLanguage('c')">C</div>
+                        <div class="menu-item" onclick="setLanguage('cpp')">C++</div>
+                        <div class="menu-item" onclick="setLanguage('csharp')">C#</div>
+                        <div class="menu-item" onclick="setLanguage('css')">CSS</div>
+                        <div class="menu-item" onclick="setLanguage('html')">HTML</div>
+                        <div class="menu-item" onclick="setLanguage('java')">Java</div>
+                        <div class="menu-item" onclick="setLanguage('javascript')">JavaScript</div>
+                        <div class="menu-item" onclick="setLanguage('json')">JSON</div>
+                        <div class="menu-item" onclick="setLanguage('markdown')">Markdown</div>
+                        <div class="menu-item" onclick="setLanguage('php')">PHP</div>
+                        <div class="menu-item" onclick="setLanguage('python')">Python</div>
+                        <div class="menu-item" onclick="setLanguage('rust')">Rust</div>
+                        <div class="menu-item" onclick="setLanguage('sql')">SQL</div>
+                        <div class="menu-item" onclick="setLanguage('xml')">XML</div>
+                    </div>
+                </div>
+                <div class="menu-item has-submenu">
+                    <span>Tools</span>
+                    <div class="submenu">
+                        <div class="menu-item" onclick="insertDateTime()">Insert Date and Time</div>
+                        <div class="menu-item" onclick="sortLines()">Sort Lines</div>
+                        <div class="menu-item" onclick="removeTrailingSpaces()">Remove Trailing Spaces</div>
+                        <div class="divider"></div>
+                        <div class="menu-item" onclick="tabsToSpaces()">Convert Tabs to Spaces</div>
+                        <div class="menu-item" onclick="spacesToTabs()">Convert Spaces to Tabs</div>
+                        <div class="divider"></div>
+                        <div class="menu-item" onclick="changeCase('upper')">Make Uppercase</div>
+                        <div class="menu-item" onclick="changeCase('lower')">Make Lowercase</div>
+                        <div class="divider"></div>
+                        <div class="menu-item" onclick="performBase64Encode()">Base64 Encode</div>
+                        <div class="menu-item" onclick="performBase64Decode()">Base64 Decode</div>
+                        <div class="menu-item" onclick="convertToHex()">String to HEX</div>
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="menu-item" onclick="showDocumentStats()">Document Statistics</div>
+                <div class="menu-item" onclick="window.print()">Print...<span class="hotkey">Ctrl+P</span></div>
+                <div class="divider"></div>
+                <div class="menu-item" onclick="showPrefModal()">Preferences</div>
+                <div class="menu-item" onclick="showShortcutModal()">Keyboard Shortcuts</div>
+                <div class="menu-item" onclick="showAboutModal()">About</div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div id="tabbar"></div>
+
+<div id="main-workspace">
+    <div id="side-panel">
+        <div class="side-panel-header">Documents</div>
+        <div id="document-list"></div>
+    </div>
+
+    <div id="editor-container">
+        <div id="line-numbers">1</div>
+        <div id="code-wrapper">
+            <div id="active-line-highlight"></div>
+            <textarea id="editor" wrap="off" oninput="handleInput()" onkeyup="updateStatusBarCursor()" onclick="updateStatusBarCursor()" onscroll="syncScroll()" spellcheck="false"></textarea>
+            <pre id="highlighting" aria-hidden="true"><code class="language-none" id="highlighting-content"></code></pre>
+        </div>
+    </div>
+</div>
+
+<div id="statusbar">
+    <div class="sb-section" id="sb-position">Line 1, Column 1</div>
+    <div class="sb-section" id="sb-tabwidth">Tab Width: 4</div>
+    <div class="sb-section sb-right" id="sb-type">Plain Text</div>
+</div>
+
+<div id="msg-box-modal" class="modal">
+    <div class="modal-header">
+        <span id="msg-box-title">Gedit WebApp</span>
+    </div>
+    <div class="modal-body">
+        <p id="msg-box-text"></p>
+        <div id="msg-box-input-container" style="display:none; margin-top: 15px;">
+            <input type="text" id="msg-box-input" class="gnome-input">
+        </div>
+        <div class="actions" id="msg-box-actions"></div>
+    </div>
+</div>
+
+<div id="find-modal" class="modal">
+    <div class="modal-header">
+        <span id="find-modal-title">Find</span>
+        <button class="close-btn" onclick="closeFindModal()">✖</button>
+    </div>
+    <div class="modal-body">
+        <div class="input-row">
+            <input type="text" id="find-input" class="gnome-input" placeholder="Search for...">
+        </div>
+        <div class="input-row" id="replace-row" style="display:none;">
+            <input type="text" id="replace-input" class="gnome-input" placeholder="Replace with...">
+        </div>
+        <div class="options">
+            <label class="check-label"><input type="checkbox" id="find-match-case"> Match case</label>
+            <label class="check-label"><input type="checkbox" id="find-wrap" checked> Wrap around</label>
+        </div>
+        <div class="actions">
+            <button class="btn" onclick="doFindNext()">Find Next</button>
+            <button class="btn" id="btn-replace" onclick="doReplace()" style="display:none;">Replace</button>
+            <button class="btn btn-primary" id="btn-replace-all" onclick="doReplaceAll()" style="display:none;">Replace All</button>
+        </div>
+    </div>
+</div>
+
+<div id="about-modal" class="modal">
+    <div class="modal-header">
+        <span>About Gedit WebApp</span>
+        <button class="close-btn" onclick="closeAboutModal()">✖</button>
+    </div>
+    <div class="modal-body" style="text-align:center;">
+        <svg viewBox="0 0 64 64" width="48" height="48" style="margin-bottom:10px;"><rect x="12" y="8" width="40" height="48" rx="4" fill="#e0e0e0"/><path d="M16 16h32v4H16zm0 8h32v4H16zm0 8h24v4H16zm0 8h32v4H16z" fill="#999"/></svg>
+        <h2 style="margin-bottom: 5px;">Gedit WebApp</h2>
+        <p style="color: var(--text-main); opacity: 0.7; margin-bottom: 15px; font-size: 13px;">A fully-featured, web-based clone of the GNOME Text Editor.</p>
+        
+        <div class="about-features">
+            <strong>File Management</strong>
+            <p>Open, Save, Save As, and Save All functionality. Tabbed interface with drag-and-drop tab reordering and Right-Click native renaming.</p>
+            
+            <strong>Editing & Formatting</strong>
+            <p>Full Undo/Redo, Find & Replace (with Match Case and Wrapping), Go to Line, Line Duplication, Quick Line Moving (Up/Down), Join Lines, Indent/Unindent, Sort Lines alphabetically, Change Case (Upper/Lower), Remove Trailing Spaces, and Convert Tabs to Spaces.</p>
+            
+            <strong>View & Interface</strong>
+            <p>Seamless Light/Dark Mode toggle, Fullscreen Mode, Word Wrap, Line Numbers, Ctrl+Scroll Zooming, Collapsible Side Panel for document switching, and Current Line Highlighting.</p>
+            
+            <strong>Tools & Extras</strong>
+            <p>Insert Date/Time, Document Statistics (Lines/Words/Chars count), native Browser Spellchecker toggle, Base64 Encode/Decode, String to HEX conversion, and Printing.</p>
+            
+            <strong>Syntax Highlighting</strong>
+            <p>Real-time Prism.js engine supporting C, C++, C#, CSS, HTML, Java, JavaScript, JSON, Markdown, PHP, Python, Rust, SQL, XML, and Plain Text.</p>
+        </div>
+
+        <div class="actions" style="justify-content: center; margin-top: 15px;">
+            <button class="btn btn-primary" onclick="closeAboutModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+<div id="pref-modal" class="modal">
+    <div class="modal-header">
+        <span>Preferences</span>
+        <button class="close-btn" onclick="closePrefModal()">✖</button>
+    </div>
+    <div class="modal-body">
+        <div class="pref-group">
+            <span class="pref-group-title">View</span>
+            <label class="check-label"><input type="checkbox" id="pref-line-numbers" onchange="toggleLineNumbers()" checked> Display line numbers</label>
+            <label class="check-label"><input type="checkbox" id="pref-word-wrap" onchange="toggleWordWrap()"> Enable text wrapping</label>
+        </div>
+        <div class="pref-group">
+            <span class="pref-group-title">Editor</span>
+            <div class="input-row">
+                <label>Tab width:</label>
+                <input type="number" id="pref-tab-size" class="gnome-input" value="4" min="1" max="16" onchange="changeTabSizePref()" style="width: 60px;">
+            </div>
+        </div>
+        <div class="pref-group">
+            <span class="pref-group-title">Font</span>
+            <div class="input-row" style="display: flex; gap: 10px;">
+                <select id="pref-font-family" class="gnome-input" onchange="changeFontFamilyPref()" style="flex-grow: 1;">
+                    <option value="'Ubuntu Mono', monospace">Ubuntu Mono</option>
+                    <option value="Monospace">System Monospace</option>
+                    <option value="'Courier New', Courier, monospace">Courier New</option>
+                </select>
+                <input type="number" id="pref-font-size" class="gnome-input" value="14" onchange="changeFontSizePref()" style="width: 70px;">
+            </div>
+        </div>
+        <div class="actions">
+            <button class="btn" onclick="closePrefModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+<div id="shortcut-modal" class="modal">
+    <div class="modal-header">
+        <span>Keyboard Shortcuts</span>
+        <button class="close-btn" onclick="closeShortcutModal()">✖</button>
+    </div>
+    <div class="modal-body" style="max-height: 350px; overflow-y: auto;">
+        <table class="shortcut-table">
+            <tbody>
+                <tr><td>New Document</td><td>Ctrl+N</td></tr>
+                <tr><td>Open Document</td><td>Ctrl+O</td></tr>
+                <tr><td>Save Document</td><td>Ctrl+S</td></tr>
+                <tr><td>Save As</td><td>Ctrl+Shift+S</td></tr>
+                <tr><td>Print</td><td>Ctrl+P</td></tr>
+                <tr><td>Close Document</td><td>Ctrl+W</td></tr>
+                <tr><td>Undo</td><td>Ctrl+Z</td></tr>
+                <tr><td>Redo</td><td>Ctrl+Y</td></tr>
+                <tr><td>Indent / Unindent</td><td>Tab / Shift+Tab</td></tr>
+                <tr><td>Duplicate Line</td><td>Ctrl+D</td></tr>
+                <tr><td>Move Line Up/Down</td><td>Alt+Up / Alt+Down</td></tr>
+                <tr><td>Join Lines</td><td>Ctrl+J</td></tr>
+                <tr><td>Select All</td><td>Ctrl+A</td></tr>
+                <tr><td>Find</td><td>Ctrl+F</td></tr>
+                <tr><td>Find and Replace</td><td>Ctrl+H</td></tr>
+                <tr><td>Find Next</td><td>F3</td></tr>
+                <tr><td>Go To Line</td><td>Ctrl+G</td></tr>
+                <tr><td>Toggle Side Panel</td><td>F9</td></tr>
+                <tr><td>Toggle Fullscreen</td><td>F11</td></tr>
+                <tr><td>Zoom In/Out</td><td>Ctrl+Scroll</td></tr>
+                <tr><td>Reset Zoom</td><td>Ctrl+0</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js'></script><script  src="./script.js"></script>
+
+  </body>
+  
+</html>
